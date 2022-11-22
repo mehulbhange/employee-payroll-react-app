@@ -8,8 +8,7 @@ import EmployeeService from '../../service/EmployeeService';
 
 class PayrollForm extends Component {
 
-    allDepartment = ["HR", "Sales", "Finance", "Engineer", "Others"];
-
+    
     constructor(props){
         super(props);
         
@@ -19,11 +18,12 @@ class PayrollForm extends Component {
             gender:"",
             departments: [],
             salary: "400000",
-            startDate: "",
             notes: "",
             day:"",
             month:"",
             year:"",
+            submitMsg:"",
+            nameError:"",
         }
     }
 
@@ -42,12 +42,43 @@ class PayrollForm extends Component {
         //console.log("Employee object "+ empObject)
         console.log("Employee object "+JSON. stringify(empObject));
 
-        EmployeeService.addEmployee(empObject)
+        EmployeeService.addEmployee(empObject).then( (response) =>{
+            this.setState({
+                submitMsg: "Employee added successfully"
+            })
+            setInterval(() => {
+                this.setState({
+                    submitMsg: ""
+                })    
+            },10000)
+        }).catch( (error) =>{
+            this.setState({
+                submitMsg: "error Something went wrong! Record not added"
+            })
+            setInterval(() => {
+                this.setState({
+                    submitMsg: ""
+                })    
+            },10000)
+        })
 
+        
     }
 
     onValueChange = (event) => {
-        
+        const nameRegex = RegExp("^[A-Z]{1}[a-zA-Z\\s]{2,}$");
+        if( event.target.name == "name"){
+            if(nameRegex.test(event.target.value)){
+                this.setState({
+                    nameError:''
+                })    
+            }else{
+                this.setState({
+                    nameError:"Invalid name"
+                })
+            }
+        }
+
         this.setState({
             [event.target.name] : event.target.value 
         });
@@ -66,7 +97,7 @@ class PayrollForm extends Component {
             let index = deptArray.indexOf(event.target.value);
             deptArray.splice(index,1);
         }
-        console.log("departments : "+ deptArray);
+        //console.log("departments : "+ deptArray);
         this.setState({
             departments : deptArray,
         })
@@ -79,11 +110,11 @@ class PayrollForm extends Component {
             gender:"",
             departments: [],
             salary: "400000",
-            startDate: "",
             notes: "",
             day:"",
             month:"",
             year:"",
+            submitMsg:"",
         })
     }
     
@@ -102,6 +133,7 @@ class PayrollForm extends Component {
                         <div className="row-content">
                             <label className="label text" htmlFor="name"> Name : </label>
                             <input className="input" onChange={this.onValueChange} type="text" name="name" id="name" placeholder="Your name." required />
+                            <span className='error-output'> {this.state.nameError} </span>
                         </div>
 
                         <div className="row-content">
@@ -129,9 +161,9 @@ class PayrollForm extends Component {
                         <div className="row-content">
                             <label htmlFor="gender" className="label text">Gender</label>
                             <div>
-                                <input type="radio" onChange={this.onValueChange} name="gender" id="male" value="male" />
+                                <input type="radio" onChange={this.onValueChange} name="gender" id="male" value="male" required />
                                 <label htmlFor="male" className="text">Male</label>
-                                <input type="radio" onChange={this.onValueChange} name="gender" id="female" value="female" />
+                                <input type="radio" onChange={this.onValueChange} name="gender" id="female" value="female" required/>
                                 <label htmlFor="female" className="text">Female</label>
                             </div>
                         </div>
@@ -223,7 +255,14 @@ class PayrollForm extends Component {
 
                         <div className="row-content">
                             <label htmlFor="notes" className="label text">Notes</label>
-                            <textarea name="notes" id="notes" className="input" onChange={this.onValueChange}></textarea>
+                            <textarea name="notes" id="notes" className="input" onChange={this.onValueChange} required></textarea>
+                        </div>
+
+                        <div>
+                
+                            {
+                                this.state.submitMsg.startsWith("error")? <span className='errorMsg'>{this.state.submitMsg.substring(6)}</span> : <span className='successMsg'>{this.state.submitMsg}</span>
+                            }
                         </div>
 
                         <div className="buttonParent">
