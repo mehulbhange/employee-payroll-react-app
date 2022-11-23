@@ -12,8 +12,8 @@ function App() {
       <Header />
       <Router>
         <Switch>
-          <Route path="/payroll-form"><PayrollForm /></Route>
-          <Route path="/home"><Home /></Route>
+          <Route path="/payroll-form" component={PayrollForm}></Route>
+          <Route path="/home" component={Home}></Route>
         </Switch>
       </Router>
       

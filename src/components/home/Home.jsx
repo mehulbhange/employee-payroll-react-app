@@ -4,17 +4,28 @@ import addIcon from '../../assets/icons/add-24px.svg'
 import editIcon from '../../assets/icons/create-black-18dp.svg';
 import deleteIcon from '../../assets/icons/delete-black-18dp.svg';
 import EmployeeService from '../../service/EmployeeService';
+import { Link  } from 'react-router-dom'
 
 class Home extends Component {
 
     constructor(props){
         super(props);
-
         this.state = {
             employeeList : [],
         }
+
     }
 
+    updateEmployee = (employeeId) => {
+        console.log("update id : "+ employeeId);
+        this.props.history.push('payroll-form',employeeId={employeeId})
+    };
+
+    deleteEmployee = (employeeId) => {
+        let empId = parseInt(employeeId)
+        EmployeeService.deleteEmployee(empId);
+        window.location.reload();
+    }
     
 
     fetchData() {
@@ -49,22 +60,21 @@ class Home extends Component {
                     <table id="table-display" className="table">
                         
                         <tr>
-                            <th></th>
+                            <th>Profile</th>
                             <th>Name</th>
                             <th>Gender</th>
                             <th>Department</th>
                             <th>Salary</th>
                             <th>Start Date</th>
+                            <th>Notes</th>
                             <th>Actions</th>
                         </tr>
                         
                         {
-                            this.state.employeeList.map( (employee) => {
-                                console.log("Employee details" + JSON.stringify(employee));
-                                console.log("Employee profile :"+ employee.profilePic);
-                                let pp = employee.profilePic
-                                return(
+                            this.state.employeeList.map( (employee) => 
+                                
                                 <tr key={employee.id}>
+                                    
                                     <td><img src={employee.profilePic} alt="ProfilePic" /></td>
                                     <td>{employee.name}</td>
                                     <td>{employee.gender}</td>
@@ -76,19 +86,19 @@ class Home extends Component {
                                     
                                     <td>{employee.salary}</td>
 									<td>{employee.startDate}</td>
-
+                                    <td>{employee.note} </td>
                                     <td>
                                         <img id={employee.id} 
-                                        onClick=""
-                                        src={editIcon}
+                                        onClick={() => this.deleteEmployee(employee.employeeId)}
+                                        src={deleteIcon}
                                         alt="delete"/>
                                         
-                                        <img id={employee.id} onClick="" src={deleteIcon} alt="edit"/>
+                                        <img id={employee.id} onClick={() => this.updateEmployee(employee.employeeId)} src={editIcon} alt="edit"/>
+                                        
                                     </td>
 
-                                </tr>
-                                )  
-                            })
+                                </tr>    
+                            )
                         }
                         
                     </table>
